@@ -1,0 +1,120 @@
+/* style.css */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 20px;
+}
+
+.chat-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    padding: 20px;
+    margin-top: 0;
+    background-color: #f0f2f5;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Styles pour les nouveaux boutons d'option */
+.option-buttons {
+    display: flex; /* Utilise Flexbox pour aligner les boutons horizontalement */
+    flex-wrap: wrap; /* Permet aux boutons de passer à la ligne si l'espace est insuffisant */
+    gap: 10px; /* Espace entre les boutons */
+    padding: 15px 0; /* Ajout de padding pour le conteneur des boutons */
+}
+
+.sub-option-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    /* Ensure text within buttons is centered if needed, though default is fine */
+    text-align: center; 
+}
+
+.sub-option-btn:hover {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+}
+
+#chat-box {
+    height: 500px;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f9f9f9;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.user-message, .bot-message {
+    margin: 10px;
+    padding: 12px 15px;
+    border-radius: 18px;
+    max-width: 70%;
+    line-height: 1.4;
+    word-wrap: break-word; 
+}
+
+.user-message {
+    background: #0078d4;
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+.bot-message {
+    background: #e5e5ea;
+    color: black;
+    margin-right: auto;
+    text-align: left;
+}
+
+.input-area {
+    display: flex;
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #ddd;
+}
+
+#user-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-size: 16px;
+}
+
+#user-input::placeholder {
+    color: #999;
+}
+
+#send-btn {
+    margin-left: 10px;
+    padding: 12px 20px;
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+#send-btn:hover {
+    background: #106ebe;
+}

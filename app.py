@@ -5,9 +5,25 @@ from flask import Flask, render_template, request, jsonify
 from threading import Thread
 from pymongo import MongoClient
 from groq import Groq
+from supabase import create_client
+
+url = "https://dxbyncqvkmifcvabhbey.supabase.co"
+SUP_API_KEY = os.getenv("SUP_API_KEY")
+supabase = create_client(url, SUP_API_KEY)
+
+data = supabase.table("Wilgo_chapitres").select("*").eq("id_leçon", 1).execute()
+print(data)
+
+chapitres = data.data  # Ceci est une liste de dictionnaires
+
+# Extraction des noms dans une liste
+noms = [chapitre["nom"] for chapitre in chapitres]
+
+print(noms)
+
 
 # 🔐 Paramètre unique
-SUJET_D_EXERCICE = "math"  # ou n'importe quelle valeur de base
+SUJET_D_EXERCICE = noms[0]
 
 # 🔐 MongoDB
 client = MongoClient("mongodb://localhost:27017/")
@@ -74,33 +90,10 @@ prompt_manager = PromptManager()
 
 app = Flask(__name__)
 
-# 🔧 Variable temporaire pour stocker la config utilisateur
-CONFIG_UTILISATEUR = {
-    "classe": None,
-    "matiere": None,
-    "lecon": None
-}
-
 @app.route('/')
 def home():
     messages_collection.delete_many({})
     return render_template('index.html', welcome_message=prompt_manager.welcome)
-
-@app.route('/config', methods=['POST'])
-def config():
-    classe = request.form.get("classe")
-    matiere = request.form.get("matiere")
-    lecon = request.form.get("lecon")
-
-    if not (classe and matiere and lecon):
-        return "Champs manquants", 400
-
-    CONFIG_UTILISATEUR["classe"] = classe
-    CONFIG_UTILISATEUR["matiere"] = matiere
-    CONFIG_UTILISATEUR["lecon"] = lecon
-
-    welcome = f"Bienvenue ! Vous avez choisi : Classe {classe}, Matière {matiere}, Leçon {lecon}."
-    return render_template("index.html", welcome_message=welcome)
 
 @app.route('/chat', methods=['POST'])
 def chat():

@@ -3,35 +3,22 @@ import re
 import sys
 from flask import Flask, render_template, request, jsonify
 from threading import Thread
-from pymongo import MongoClient
 from groq import Groq
 from supabase import create_client
 
+# 🔗 Supabase
 url = "https://dxbyncqvkmifcvabhbey.supabase.co"
-SUP_API_KEY = os.getenv("SUP_API_KEY")
-supabase = create_client(url, SUP_API_KEY)
+key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4YnluY3F2a21pZmN2YWJoYmV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzMzc1MTYsImV4cCI6MjA2ODkxMzUxNn0.Eww30cCJ6NXRKWDGRK1Tr7Zr6pTb1O5O2gKSTdnfzpk"
+supabase = create_client(url, key)
 
-data = supabase.table("Wilgo_chapitres").select("*").eq("id_leçon", 1).execute()
-print(data)
+# ✅ Valeur par défaut (sera remplacée dans /config)
+SUJET_D_EXERCICE = "math"
 
-chapitres = data.data  # Ceci est une liste de dictionnaires
-
-# Extraction des noms dans une liste
-noms = [chapitre["nom"] for chapitre in chapitres]
-
-print(noms)
-
-
-# 🔐 Paramètre unique
-SUJET_D_EXERCICE = noms[0]
-
-# 🔐 MongoDB
-client = MongoClient("mongodb://localhost:27017/")
-db = client["MaBD"]
-messages_collection = db["testing"]
+# 🧠 Stockage en mémoire
+conversation_history = []  # Liste pour stocker la conversation
 
 # 🔐 Clé API Groq
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY") or "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"
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 # 🧠 Gestionnaire de prompts
@@ -45,7 +32,6 @@ class PromptManager:
         self.load_config()
 
     def load_config(self):
-        """Charge la configuration depuis le fichier Markdown"""
         try:
             with open(self.config_file, "r", encoding="utf-8") as f:
                 content = f.read()
@@ -60,7 +46,6 @@ class PromptManager:
             self.assistant = self._clean(self.assistant)
             self.welcome = self._clean(self.welcome)
 
-            # Remplacement dynamique
             for attr in ['system', 'safety', 'assistant', 'welcome']:
                 val = getattr(self, attr)
                 val = val.replace('[SUJET_D_EXERCICE]', SUJET_D_EXERCICE)
@@ -74,7 +59,6 @@ class PromptManager:
         return match.group(1).strip() if match else ""
 
     def build_prompt(self, conversation):
-        """Construit le prompt dynamique"""
         return f"""
 {self.system}
 
@@ -87,12 +71,55 @@ class PromptManager:
 
 # 📦 Initialisation
 prompt_manager = PromptManager()
-
 app = Flask(__name__)
+
+# 🔧 Configuration temporaire
+CONFIG_UTILISATEUR = {
+    "classe": None,
+    "matiere": None,
+    "lecon": None
+}
 
 @app.route('/')
 def home():
-    messages_collection.delete_many({})
+    conversation_history.clear()  # ❌ Vide la conversation à chaque (re)ouverture
+    return render_template('index.html', welcome_message=prompt_manager.welcome)
+
+@app.route('/config', methods=['POST'])
+def config():
+    classe = request.form.get("classe")
+    matiere = request.form.get("matiere")
+    lecon = request.form.get("lecon")
+
+    if not (classe and matiere and lecon):
+        return "Champs manquants", 400
+
+    CONFIG_UTILISATEUR["classe"] = int(classe)
+    CONFIG_UTILISATEUR["matiere"] = int(matiere)
+    CONFIG_UTILISATEUR["lecon"] = int(lecon)
+
+    data = supabase.table("Wilgo_chapitres") \
+        .select("*") \
+        .eq("id_lecon", CONFIG_UTILISATEUR["lecon"]) \
+        .eq("id_matiere", CONFIG_UTILISATEUR["matiere"]) \
+        .eq("id_niveau", CONFIG_UTILISATEUR["classe"]) \
+        .execute()
+
+    chapitres = data.data or []
+
+    if not chapitres:
+        return "Aucun chapitre trouvé.", 404
+
+    noms = [chapitre["nom"] for chapitre in chapitres]
+
+    global SUJET_D_EXERCICE
+    SUJET_D_EXERCICE = noms[0]
+
+    # 🔄 Recharger les prompts avec la nouvelle valeur
+    prompt_manager.load_config()
+
+    conversation_history.clear()  # ❌ Vide la conversation si on revalide les paramètres
+
     return render_template('index.html', welcome_message=prompt_manager.welcome)
 
 @app.route('/chat', methods=['POST'])
@@ -102,16 +129,16 @@ def chat():
     if not user_message:
         return jsonify({"error": "Message vide"}), 400
 
-    messages_collection.insert_one({"role": "User", "content": user_message})
-    history = list(messages_collection.find({}, {"_id": 0}))
+    # 🧠 Ajouter le message utilisateur
+    conversation_history.append({"role": "User", "content": user_message})
 
     try:
+        formatted_history = "\n".join([f"{m['role']}: {m['content']}" for m in conversation_history])
+
         chat_completion = groq_client.chat.completions.create(
             model="llama3-70b-8192",
             messages=[
-                {"role": "system", "content": prompt_manager.build_prompt(
-                    "\n".join([f"{m['role']}: {m['content']}" for m in history])
-                )}
+                {"role": "system", "content": prompt_manager.build_prompt(formatted_history)}
             ],
             temperature=0.7,
             max_tokens=1024,
@@ -121,7 +148,8 @@ def chat():
 
         ai_response = chat_completion.choices[0].message.content
 
-        messages_collection.insert_one({"role": "Assistant", "content": ai_response})
+        # 🧠 Ajouter la réponse de l'assistant
+        conversation_history.append({"role": "Assistant", "content": ai_response})
 
         return jsonify({"response": ai_response})
 

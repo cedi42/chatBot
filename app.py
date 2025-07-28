@@ -7,19 +7,19 @@ from groq import Groq
 from supabase import create_client
 
 # 🔗 Supabase
-url = "https://dxbyncqvkmifcvabhbey.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4YnluY3F2a21pZmN2YWJoYmV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzMzc1MTYsImV4cCI6MjA2ODkxMzUxNn0.Eww30cCJ6NXRKWDGRK1Tr7Zr6pTb1O5O2gKSTdnfzpk"
-supabase = create_client(url, key)
+# url = "https://dxbyncqvkmifcvabhbey.supabase.co"
+# SUP_API_KEY = os.getenv("SUP_API_KEY")
+# supabase = create_client(url, SUP_API_KEY)
 
 # ✅ Valeur par défaut (sera remplacée dans /config)
 SUJET_D_EXERCICE = "math"
 
 # 🧠 Stockage en mémoire
-conversation_history = []  # Liste pour stocker la conversation
+conversation_history = [] # Liste pour stocker la conversation
 
 # 🔐 Clé API Groq
-GROQ_API_KEY = os.getenv("GROQ_API_KEY") or "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"
-groq_client = Groq(api_key=GROQ_API_KEY)
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# groq_client = Groq(api_key=GROQ_API_KEY)
 
 # 🧠 Gestionnaire de prompts
 class PromptManager:

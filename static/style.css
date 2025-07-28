@@ -1,120 +1,241 @@
-/* style.css */
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f7fa;
+    background-color: #e0f2f7; /* A softer, light blue background */
     margin: 0;
     padding: 20px;
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    min-height: 100vh; /* Ensure it takes full viewport height */
+    box-sizing: border-box; /* Include padding in element's total width and height */
 }
 
+/* Chat Container */
 .chat-container {
-    max-width: 800px;
+    max-width: 700px; /* Slightly narrower for better focus */
+    width: 100%; /* Ensure it takes full width on smaller screens */
     margin: 0 auto;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    background: #ffffff; /* Pure white for a clean look */
+    border-radius: 15px; /* More rounded corners */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15); /* Stronger, softer shadow */
     overflow: hidden;
+    display: flex; /* Use flexbox for internal layout (header, chatbox, input) */
+    flex-direction: column; /* Stack children vertically */
+    min-height: 700px; /* Give it a decent minimum height */
 }
 
-h1 {
+/* Header (Chatbot Title) */
+.chat-container h1 {
     text-align: center;
-    color: #333;
-    padding: 20px;
-    margin-top: 0;
-    background-color: #f0f2f5;
-    border-bottom: 1px solid #ddd;
+    color: #333; /* Darker text */
+    padding: 20px 0;
+    margin: 0;
+    background: #f0f8ff; /* Light blue header background */
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 1.8em; /* Slightly larger title */
+    font-weight: 600; /* Medium bold */
 }
 
-/* Styles pour les nouveaux boutons d'option */
-.option-buttons {
-    display: flex; /* Utilise Flexbox pour aligner les boutons horizontalement */
-    flex-wrap: wrap; /* Permet aux boutons de passer à la ligne si l'espace est insuffisant */
-    gap: 10px; /* Espace entre les boutons */
-    padding: 15px 0; /* Ajout de padding pour le conteneur des boutons */
+/* Configuration Form */
+form {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: 10px; /* Space between form elements */
+    padding: 15px;
+    background: #fdfdfd; /* Very light background for form */
+    border-bottom: 1px solid #eee;
+    justify-content: center; /* Center form elements */
 }
 
-.sub-option-btn {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 8px 15px;
+form input[type="number"],
+form button[type="submit"] {
+    padding: 10px 15px;
+    border: 1px solid #cce7ff; /* Lighter, blue-ish border */
+    border-radius: 8px; /* Slightly less rounded for inputs */
+    font-size: 0.95em;
+    outline: none;
+    transition: all 0.3s ease; /* Smooth transitions */
+}
+
+form input[type="number"] {
+    flex: 1; /* Allow inputs to grow */
+    min-width: 120px; /* Minimum width for inputs */
+}
+
+form input[type="number"]:focus {
+    border-color: #007bff; /* Highlight on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+form button[type="submit"] {
+    background: #007bff; /* Primary blue */
+    color: white;
     cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    /* Ensure text within buttons is centered if needed, though default is fine */
-    text-align: center; 
+    flex-shrink: 0; /* Don't shrink the button */
 }
 
-.sub-option-btn:hover {
-    background-color: #e0e0e0;
-    border-color: #bbb;
+form button[type="submit"]:hover {
+    background: #0056b3; /* Darker blue on hover */
+    transform: translateY(-1px); /* Slight lift effect */
 }
 
+/* Error Message Styling */
+.error-message {
+    color: #dc3545; /* Bootstrap red for errors */
+    background-color: #f8d7da; /* Light red background */
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin: 10px 15px; /* Add margin around it */
+    text-align: center;
+    font-size: 0.9em;
+}
+
+
+/* Chat Box */
 #chat-box {
-    height: 500px;
+    flex-grow: 1; /* Allow chat box to take available space */
     padding: 20px;
     overflow-y: auto;
-    background: #f9f9f9;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
+    background: #fbfbfb; /* Very light grey background */
+    display: flex; /* Use flexbox for messages */
+    flex-direction: column; /* Stack messages vertically */
+    gap: 10px; /* Space between messages */
+    scroll-behavior: smooth; /* Smooth scrolling */
 }
 
+/* Message Bubbles */
 .user-message, .bot-message {
-    margin: 10px;
-    padding: 12px 15px;
-    border-radius: 18px;
-    max-width: 70%;
-    line-height: 1.4;
-    word-wrap: break-word; 
+    padding: 12px 18px; /* Slightly more padding */
+    border-radius: 20px; /* More pill-shaped */
+    max-width: 75%; /* Slightly more width for messages */
+    line-height: 1.5; /* Better readability */
+    font-size: 0.95em;
+    word-wrap: break-word; /* Ensure long words break */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
 }
 
 .user-message {
-    background: #0078d4;
+    background: #007bff; /* Primary blue for user messages */
     color: white;
-    margin-left: auto;
-    text-align: right;
+    align-self: flex-end; /* Align to the right */
+    margin-right: 5px; /* Small margin from edge */
 }
 
 .bot-message {
-    background: #e5e5ea;
-    color: black;
-    margin-right: auto;
-    text-align: left;
+    background: #e9ecef; /* Light grey for bot messages */
+    color: #343a40; /* Darker text for readability */
+    align-self: flex-start; /* Align to the left */
+    margin-left: 5px; /* Small margin from edge */
 }
 
+/* Bot Thinking Message */
+#bot-thinking {
+    background: #d4edda; /* Light green for a "thinking" indication */
+    color: #155724; /* Dark green text */
+    font-style: italic;
+    animation: pulse 1.5s infinite; /* Simple pulse animation */
+}
+
+/* Pulse animation for thinking message */
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+/* Input Area */
 .input-area {
     display: flex;
     padding: 15px;
-    background: white;
-    border-top: 1px solid #ddd;
+    background: #ffffff; /* White background */
+    border-top: 1px solid #e0e0e0; /* Lighter border */
+    gap: 10px; /* Space between input and button */
 }
 
 #user-input {
     flex: 1;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
+    padding: 12px 18px; /* More padding */
+    border: 1px solid #ced4da; /* Muted border color */
+    border-radius: 25px; /* More rounded */
     outline: none;
-    font-size: 16px;
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-#user-input::placeholder {
-    color: #999;
+#user-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
 }
 
 #send-btn {
-    margin-left: 10px;
-    padding: 12px 20px;
-    background: #0078d4;
+    padding: 12px 25px; /* More padding for a larger button */
+    background: #007bff; /* Primary blue */
     color: white;
     border: none;
-    border-radius: 20px;
+    border-radius: 25px; /* More rounded */
     cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s ease;
+    font-size: 1em;
+    font-weight: 500;
+    transition: background 0.3s ease, transform 0.2s ease;
 }
 
 #send-btn:hover {
-    background: #106ebe;
+    background: #0056b3;
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); /* Subtle hover shadow */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .chat-container {
+        min-height: 95vh; /* Take more height on smaller screens */
+        border-radius: 0; /* No border-radius for full-width look */
+        box-shadow: none; /* No shadow */
+    }
+
+    .chat-container h1 {
+        font-size: 1.5em;
+        padding: 15px 0;
+    }
+
+    form {
+        flex-direction: column; /* Stack inputs vertically */
+        padding: 10px;
+    }
+
+    form input[type="number"] {
+        width: 100%; /* Full width inputs */
+        min-width: unset;
+    }
+
+    form button[type="submit"] {
+        width: 100%; /* Full width button */
+    }
+
+    #chat-box {
+        padding: 15px;
+        height: unset; /* Let height adjust naturally */
+        min-height: 400px; /* Ensure some minimum height */
+    }
+
+    .user-message, .bot-message {
+        max-width: 85%; /* Allow messages to take more width */
+        font-size: 0.9em;
+    }
+
+    .input-area {
+        padding: 10px;
+        flex-direction: column; /* Stack input and button vertically */
+        gap: 8px;
+    }
+
+    #user-input, #send-btn {
+        width: 100%; /* Full width for input and button */
+        border-radius: 8px; /* Less rounded for full-width */
+    }
 }

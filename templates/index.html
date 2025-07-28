@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/static/gg.png">
     <title>Chatbot Flask</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="chat-container">
-        <h1>Mon Assistant</h1>
-
-        <!-- ✅ Formulaire pour la configuration -->
+        <h1>Professor AI</h1>
         <form action="/config" method="POST">
-            <input type="number" name="classe" placeholder="Entrez votre classe" required>
-            <input type="number" name="matiere" placeholder="Entrez votre matière" required>
-            <input type="number" name="lecon" placeholder="Entrez votre leçon" required>
+            <input type="number" name="classe" placeholder="Entrez votre classe.." required>
+            <input type="number" name="matiere" placeholder="Entrez votre matière.." required>
+            <input type="number" name="lecon" placeholder="Entrez votre leçon.." required>
             <button type="submit">Valider</button>
         </form>
 
-        <!-- ✅ Zone de chat -->
+        {% if error_message %}
+            <div class="error-message" style="color: red; margin-top: 10px;">{{ error_message }}</div>
+        {% endif %}
+
         <div id="chat-box">
             <div class="bot-message">{{ welcome_message }}</div>
         </div>
@@ -43,8 +45,18 @@
 
         if (message) {
             const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML += <div class="user-message">${message}</div>;
-            input.value = '';
+            // Add user message to chat box immediately
+            chatBox.innerHTML += `<div class="user-message">${message}</div>`;
+            input.value = ''; // Clear input field
+
+            // Add a temporary "typing" message or spinner
+            const botThinkingMessage = document.createElement('div');
+            botThinkingMessage.classList.add('bot-message');
+            botThinkingMessage.textContent = 'Assistant en train de taper...';
+            botThinkingMessage.id = 'bot-thinking';
+            chatBox.appendChild(botThinkingMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
 
             try {
                 const response = await fetch('/chat', {
@@ -53,21 +65,31 @@
                     body: JSON.stringify({ message: message })
                 });
 
+                // Remove the thinking message
+                if (document.getElementById('bot-thinking')) {
+                    document.getElementById('bot-thinking').remove();
+                }
+
                 const data = await response.json();
 
                 if (data.response) {
-                    chatBox.innerHTML += <div class="bot-message">${data.response}</div>;
+                    chatBox.innerHTML += `<div class="bot-message">${data.response}</div>`;
                 } else if (data.error) {
-                    chatBox.innerHTML += <div class="bot-message">Erreur : ${data.error}</div>;
+                    chatBox.innerHTML += `<div class="bot-message">Erreur : ${data.error}</div>`;
                 }
             } catch (err) {
-                chatBox.innerHTML += <div class="bot-message">Erreur de connexion au serveur.</div>;
+                // Remove the thinking message on error too
+                if (document.getElementById('bot-thinking')) {
+                    document.getElementById('bot-thinking').remove();
+                }
+                chatBox.innerHTML += `<div class="bot-message">Erreur de connexion au serveur.</div>`;
             }
 
+            // Scroll to the bottom after new messages are added
             chatBox.scrollTop = chatBox.scrollHeight;
         }
     }
-</script>
+    </script>
 
 </body>
 </html>
